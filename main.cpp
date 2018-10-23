@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "IOperand.hpp"
+#include "Operand.tpp"
 #include <iostream>
 #include <iomanip>
 #include <vector>
