@@ -21,6 +21,7 @@ DIR_S = ./
 DIR_O = obj
 
 SOURCES =	main.cpp \
+			Factory.cpp \
 
 SRCS = $(addprefix $(DIR_S)/,$(SOURCES))
 
