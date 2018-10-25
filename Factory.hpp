@@ -16,7 +16,6 @@
 
 # include <iostream>
 # include "IOperand.hpp"
-# include "Operand.tpp"
 
 class Factory {
 
@@ -29,9 +28,9 @@ public:
 
 	IOperand const *createOperand(eOperandType type, std::string const &value) const;
 
-	typedef const IOperand* (Factory::*Func)(std::string const &) const;
-
 private:
+
+	typedef const IOperand* (Factory::*Func)(std::string const &) const;
 
 	IOperand const *createInt8(std::string const &value) const;
 	IOperand const *createInt16(std::string const &value) const;

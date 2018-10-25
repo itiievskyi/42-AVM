@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Factory.hpp"
+#include "Operand.tpp"
 
 Factory::Factory(void) {
 
@@ -42,6 +43,10 @@ Factory::~Factory(void) {
 	return;
 }
 
+IOperand const *Factory::createOperand(eOperandType type, std::string const &value) const {
+	return (this->*_funcs[type])(value);
+}
+
 IOperand const *Factory::createInt8(std::string const &value) const {
 	return (new Operand<int8_t>(std::stoi(value)));
 }
@@ -55,9 +60,9 @@ IOperand const *Factory::createInt32(std::string const &value) const {
 }
 
 IOperand const *Factory::createFloat(std::string const &value) const {
-	return (new Operand<float>(std::stoi(value)));
+	return (new Operand<float>(std::stof(value)));
 }
 
 IOperand const *Factory::createDouble(std::string const &value) const {
-	return (new Operand<double>(std::stoi(value)));
+	return (new Operand<double>(std::stod(value)));
 }

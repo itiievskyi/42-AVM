@@ -14,9 +14,18 @@
 # define OPERAND_T
 
 # include <iostream>
+# include <sstream>
+# include <fstream>
+# include <iomanip>
 # include "IOperand.hpp"
 
-template <class T>
+# ifndef OPERAND_T_DEFINED
+	#  define OPERAND_T_DEFINED
+		template<typename T> class Operand;
+	#  include "Factory.hpp"
+# endif
+
+template <typename T>
 class Operand : public IOperand {
 
 public:
@@ -48,76 +57,49 @@ public:
 
 	int getPrecision(void) const;
 	eOperandType getType(void) const;
-/*
-	IOperand const *operator+(IOperand const &rhs) const {
 
+	IOperand const *operator+(IOperand const &rhs) const {
+		if (this->getPrecision() < rhs.getPrecision())
+			return (rhs + *this);
+	//	T lhs_value = static_cast<T>(stod(this->_value));
+		T rhs_value = static_cast<T>(stod(rhs.toString()));
+	//	add_flow_check<T>(lhs_value, rhs_value);
+		Factory *factory = new Factory();
+		IOperand const * ret_val = factory->createOperand(this->getType(), std::to_string(static_cast<T>(stod(this->_value)) + rhs_value));
+		delete factory;
+		return ret_val;
 	}
 
 	IOperand const *operator-(IOperand const &rhs) const {
-
+		if (&rhs != nullptr) {}
+		return nullptr;
 	}
 
 	IOperand const *operator*(IOperand const &rhs) const {
-
+		if (&rhs != nullptr) {}
+		return nullptr;
 	}
 
 	IOperand const *operator/(IOperand const &rhs) const {
-
+		if (&rhs != nullptr) {}
+		return nullptr;
 	}
 
 	IOperand const *operator%(IOperand const &rhs) const {
-
+		if (&rhs != nullptr) {}
+		return nullptr;
 	}
-*/
+
 	std::string const & toString(void) const {
 		return this->_value;
 	}
 
 private:
 
-	int		_value;
-	int		_type;
+	std::string		_value;
+	eOperandType	_type;
+	Factory			*_factory;
 
 };
-
-template<> int Operand<int8_t>::getPrecision(void) const {
-	return Int8;
-}
-
-template<> eOperandType Operand<int8_t>::getType(void) const {
-	return Int8;
-}
-
-template<> int Operand<int16_t>::getPrecision(void) const {
-	return Int16;
-}
-
-template<> eOperandType Operand<int16_t>::getType(void) const {
-	return Int16;
-}
-
-template<> int Operand<int32_t>::getPrecision(void) const {
-	return Int32;
-}
-
-template<> eOperandType Operand<int32_t>::getType(void) const {
-	return Int32;
-}
-
-template<> int Operand<float>::getPrecision(void) const {
-	return Float;
-}
-
-template<> eOperandType Operand<float>::getType(void) const {
-	return Float;
-}
-
-template<> int Operand<double>::getPrecision(void) const {
-	return Double;
-}
-
-template<> eOperandType Operand<double>::getType(void) const {
-	return Double;
-}
 
 #endif
