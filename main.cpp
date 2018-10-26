@@ -23,14 +23,15 @@ int main(int argc, char **argv) {
 
 	Factory *fact;
 	fact = new Factory();
-	fact->createOperand(Double, argv[1]);
-	std::cout << (fact->createOperand(Int32, argv[1]))->getPrecision() << '\n';
 
-	IOperand *a = new Operand<float>(argv[1]);
-	IOperand *b = new Operand<int>(argv[2]);
+	IOperand const *a = fact->createOperand(Int8, argv[1]);
+	IOperand const *b = fact->createOperand(Int32, argv[2]);
 
 	std::cout << a->toString() << '\n';
 	std::cout << b->toString() << '\n';
+
+	std::cout << a->getType() << '\n';
+	std::cout << b->getType() << '\n';
 
 	std::cout << (*a + *b)->toString() << '\n';
 

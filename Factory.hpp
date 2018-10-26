@@ -28,6 +28,21 @@ public:
 
 	IOperand const *createOperand(eOperandType type, std::string const &value) const;
 
+	class CreationOutOfRangeExceprion : public std::exception {
+
+	public:
+		CreationOutOfRangeExceprion(void);
+		CreationOutOfRangeExceprion(std::string type, std::string const &value);
+		CreationOutOfRangeExceprion(const CreationOutOfRangeExceprion &src);
+		virtual ~CreationOutOfRangeExceprion(void) throw();
+		CreationOutOfRangeExceprion  &operator=(const CreationOutOfRangeExceprion &src);
+		virtual const char    *what() const throw();
+
+	private:
+		std::string		_value;
+		std::string		_type;
+	};
+
 private:
 
 	typedef const IOperand* (Factory::*Func)(std::string const &) const;

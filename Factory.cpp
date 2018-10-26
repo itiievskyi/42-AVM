@@ -12,6 +12,7 @@
 
 #include "Factory.hpp"
 #include "Operand.tpp"
+#include <string>
 
 Factory::Factory(void) {
 
@@ -44,6 +45,24 @@ Factory::~Factory(void) {
 }
 
 IOperand const *Factory::createOperand(eOperandType type, std::string const &value) const {
+	try {
+		long long test = std::stod(value);
+		if (type == Int8 && test > INT8_MAX) {
+			throw Factory::CreationOutOfRangeExceprion("Int8", value);
+		} else if (type == Int16 && test > INT16_MAX) {
+			throw Factory::CreationOutOfRangeExceprion("Int16", value);
+		} else if (type == Int32 && test > INT32_MAX) {
+			throw Factory::CreationOutOfRangeExceprion("Int32", value);
+		}
+	}
+	catch (std::out_of_range &e) {
+		std::cout << e.what() << std::endl;
+		exit (-1);
+	}
+	catch (Factory::CreationOutOfRangeExceprion &e) {
+		std::cout << e.what() << std::endl;
+		exit (-1);
+	}
 	return (this->*_funcs[type])(value);
 }
 
@@ -65,4 +84,42 @@ IOperand const *Factory::createFloat(std::string const &value) const {
 
 IOperand const *Factory::createDouble(std::string const &value) const {
 	return (new Operand<double>(std::stod(value)));
+}
+
+Factory::CreationOutOfRangeExceprion::CreationOutOfRangeExceprion(void) {
+
+	return;
+}
+
+Factory::CreationOutOfRangeExceprion::CreationOutOfRangeExceprion(
+std::string type, std::string const &value) : _value(value), _type(type) {
+
+	return;
+}
+
+Factory::CreationOutOfRangeExceprion::CreationOutOfRangeExceprion(const CreationOutOfRangeExceprion &src) {
+
+	*this = src;
+
+	return;
+}
+
+Factory::CreationOutOfRangeExceprion::~CreationOutOfRangeExceprion(void) throw() {
+
+	return;
+}
+
+Factory::CreationOutOfRangeExceprion &Factory::CreationOutOfRangeExceprion::operator=(const CreationOutOfRangeExceprion &src) {
+
+	static_cast <void> (src);
+
+	return *this;
+}
+
+const char    *Factory::CreationOutOfRangeExceprion::what() const throw() {
+
+	std::string error = "ERROR! Object of type " + _type +
+	" can't be created with the value " + _value + " due to overflow";
+
+	return error.c_str();
 }
