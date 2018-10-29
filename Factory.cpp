@@ -13,6 +13,8 @@
 #include "Factory.hpp"
 #include "Operand.tpp"
 #include <string>
+#include <limits>
+#include <cfloat>
 
 Factory::Factory(void) {
 
@@ -47,12 +49,16 @@ Factory::~Factory(void) {
 IOperand const *Factory::createOperand(eOperandType type, std::string const &value) const {
 	try {
 		long long test = std::stod(value);
-		if (type == Int8 && test > INT8_MAX) {
+		if (type == Int8 && (test > INT8_MAX || test < INT8_MIN)) {
 			throw Factory::CreationOutOfRangeExceprion("Int8", value);
-		} else if (type == Int16 && test > INT16_MAX) {
+		} else if (type == Int16 && (test > INT16_MAX || test < INT16_MIN)) {
 			throw Factory::CreationOutOfRangeExceprion("Int16", value);
-		} else if (type == Int32 && test > INT32_MAX) {
+		} else if (type == Int32 && (test > INT32_MAX || test < INT32_MIN)) {
 			throw Factory::CreationOutOfRangeExceprion("Int32", value);
+		} else if (type == Float && (test > FLT_MAX || test < -FLT_MAX)) {
+			throw Factory::CreationOutOfRangeExceprion("Float", value);
+		} else if (type == Double && (test > DBL_MAX || test < -DBL_MAX)) {
+			throw Factory::CreationOutOfRangeExceprion("Double", value);
 		}
 	}
 	catch (std::out_of_range &e) {
@@ -97,7 +103,8 @@ std::string type, std::string const &value) : _value(value), _type(type) {
 	return;
 }
 
-Factory::CreationOutOfRangeExceprion::CreationOutOfRangeExceprion(const CreationOutOfRangeExceprion &src) {
+Factory::CreationOutOfRangeExceprion::CreationOutOfRangeExceprion(
+	const CreationOutOfRangeExceprion &src) {
 
 	*this = src;
 
@@ -109,7 +116,8 @@ Factory::CreationOutOfRangeExceprion::~CreationOutOfRangeExceprion(void) throw()
 	return;
 }
 
-Factory::CreationOutOfRangeExceprion &Factory::CreationOutOfRangeExceprion::operator=(const CreationOutOfRangeExceprion &src) {
+Factory::CreationOutOfRangeExceprion &Factory::CreationOutOfRangeExceprion::operator=(
+	const CreationOutOfRangeExceprion &src) {
 
 	static_cast <void> (src);
 
@@ -119,7 +127,7 @@ Factory::CreationOutOfRangeExceprion &Factory::CreationOutOfRangeExceprion::oper
 const char    *Factory::CreationOutOfRangeExceprion::what() const throw() {
 
 	std::string error = "ERROR! Object of type " + _type +
-	" can't be created with the value " + _value + " due to overflow";
+	" can't be created with the value " + _value + " due to overflow or underflow";
 
 	return error.c_str();
 }

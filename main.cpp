@@ -24,8 +24,8 @@ int main(int argc, char **argv) {
 	Factory *fact;
 	fact = new Factory();
 
-	IOperand const *a = fact->createOperand(Int8, argv[1]);
-	IOperand const *b = fact->createOperand(Int32, argv[2]);
+	IOperand const *a = fact->createOperand(Int32, argv[1]);
+	IOperand const *b = fact->createOperand(Float, argv[2]);
 
 	std::cout << a->toString() << '\n';
 	std::cout << b->toString() << '\n';
@@ -33,7 +33,14 @@ int main(int argc, char **argv) {
 	std::cout << a->getType() << '\n';
 	std::cout << b->getType() << '\n';
 
-	std::cout << (*a + *b)->toString() << '\n';
+	std::cout << "float min = " << -FLT_MAX << '\n';
+	std::cout << "double min = " << std::numeric_limits<double>::min() << '\n';
+
+	std::cout << " + = " << (*a + *b)->toString() << '\n';
+	std::cout << " - = " << (*a - *b)->toString() << '\n';
+	std::cout << " * = " << (*a * *b)->toString() << '\n';
+	std::cout << " / = " << (*a / *b)->toString() << '\n';
+	std::cout << " % = " << (*a % *b)->toString() << '\n';
 
 	return 0;
 }
