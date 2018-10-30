@@ -10,17 +10,64 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Operand.tpp"
-#include "Factory.hpp"
 #include "AbstractVM.hpp"
-#include <iostream>
-#include <iomanip>
-#include <vector>
 
 int main(int argc, char **argv) {
 
-	if (argc < 2 && argv) {return -1;}
+	std::stack<IOperand *> avmStack;
+	std::string line;
+	eAction action = EMPTY;
+	static int count = 0;
 
+	std::ifstream input;
+	bool stdinput = false;
+
+	if (argc == 2) {
+		input.open(argv[1]);
+	}
+
+	Factory fact = Factory();
+	Parser parser = Parser();
+
+	while (!(input.eof()) && action != EXIT) {
+		++count;
+		std::getline (input, line);
+		if (line.empty() || line[0] == ';') {
+			continue;
+		}
+		parser.parse(line, stdinput, count);
+		action = parser.getAct();
+		switch (action) {
+			case PUSH:
+
+			case POP:
+
+			case DUMP:
+
+			case ASSERT:
+
+			case ADD:
+
+			case SUB:
+
+			case MUL:
+
+			case DIV:
+
+			case MOD:
+
+			case PRINT:
+
+			case EXIT:
+				break;
+			case ERROR:
+				std::cout << "Terminating the program due to error..." << std::endl;
+				return(-1);
+			case EMPTY:;
+		}
+	}
+
+/*
 	Factory *fact;
 	fact = new Factory();
 
@@ -33,14 +80,13 @@ int main(int argc, char **argv) {
 	std::cout << a->getType() << '\n';
 	std::cout << b->getType() << '\n';
 
-	std::cout << "float min = " << -FLT_MAX << '\n';
-	std::cout << "double min = " << std::numeric_limits<double>::min() << '\n';
-
 	std::cout << " + = " << (*a + *b)->toString() << '\n';
 	std::cout << " - = " << (*a - *b)->toString() << '\n';
 	std::cout << " * = " << (*a * *b)->toString() << '\n';
 	std::cout << " / = " << (*a / *b)->toString() << '\n';
 	std::cout << " % = " << (*a % *b)->toString() << '\n';
+*/
 
+	std::system("leaks -q avm");
 	return 0;
 }

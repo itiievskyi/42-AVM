@@ -15,6 +15,13 @@
 
 # include "Operand.tpp"
 # include "Factory.hpp"
+# include "Parser.hpp"
+# include <iostream>
+# include <sstream>
+# include <fstream>
+# include <iomanip>
+# include <vector>
+# include <stack>
 
 template<> int Operand<int8_t>::getPrecision(void) const {
 	return Int8;
