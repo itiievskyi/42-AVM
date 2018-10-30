@@ -22,13 +22,18 @@ int main(int argc, char **argv) {
 	bool stdinput = false;
 
 	std::ifstream filestream;
-	std::ostringstream input;
+	std::stringstream input;
 
 	Factory fact = Factory();
 	Parser parser = Parser();
 	Lexer lexer = Lexer();
 
-	if (argc == 2) {
+	if (argc == 1) {
+		while (!(std::cin.eof()) && line != ";;") {
+			std::getline(std::cin, line);
+			input << line << std::endl;
+		}
+	} else if (argc == 2) {
 		filestream.open(argv[1]);
 		input << filestream.rdbuf();
 		filestream.close();
@@ -42,8 +47,11 @@ int main(int argc, char **argv) {
 			filestream.close();
 			return -1;
 		}
-
 		filestream.open(argv[1]);
+	} else {
+		std::cout << "\033[1;31m" << "ERROR: Too many arguments" << "\033[0m"
+		<< std::endl;
+		return -1;
 	}
 
 /*
@@ -53,9 +61,9 @@ int main(int argc, char **argv) {
 		std::cout << "FAIL!" << '\n';
 	}
 */
-	while (!(filestream.eof()) && action != EXIT) {
+	while (!(input.eof()) && action != EXIT) {
 		++count;
-		std::getline (filestream, line);
+		std::getline(input, line);
 		if (line.empty() || line[0] == ';') {
 			continue;
 		}
@@ -87,6 +95,7 @@ int main(int argc, char **argv) {
 			case ERROR:
 				std::cout << "Terminating the program due to error..."
 				<< std::endl;
+				std::system("leaks -q avm");
 				return -1;
 			case EMPTY:;
 		}

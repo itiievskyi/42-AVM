@@ -71,14 +71,14 @@ void Lexer::analyze(std::string check, char *path) const {
 
 	// Checking for 'exit' command
 
-	if (!std::regex_search(check, std::regex("^exit(( )?(;)+(.)*)?"))) {
+	if (!std::regex_search(check, std::regex("(^|\\n)+exit(( )?(;)+(.)*)?"))) {
 		_error << "\033[1;33m" << "\tThere is no 'exit' command" << "\033[0m"
 		<< std::endl;
 	}
 
 	// Checking for errors presense and raising an exception
 
-	if (_error.good()) {
+	if (_error.good() && _error.str().size() > 0) {
 		std::cout << "The following lexical errors were found: " << std::endl;
 		std::cout << _error.rdbuf();
 		throw LexicalException();
