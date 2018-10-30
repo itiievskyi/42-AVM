@@ -37,7 +37,7 @@ Parser::~Parser(void) {
 }
 
 void Parser::parse(std::string line, bool stdinput, int count) {
-
+/*
 	_line = line;
 
 	static Lexer lexer = Lexer();
@@ -49,8 +49,9 @@ void Parser::parse(std::string line, bool stdinput, int count) {
 		<< ": \033[1;31m" << _line << "\033[0m" << std::endl;
 		_act = ERROR;
 	}
-
-	if (stdinput) {}
+*/
+//	std::cout << "/* message */" << '\n';
+	if (stdinput && line != "" && count) {}
 
 }
 

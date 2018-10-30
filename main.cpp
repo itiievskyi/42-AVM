@@ -15,23 +15,47 @@
 int main(int argc, char **argv) {
 
 	std::stack<IOperand *> avmStack;
+
 	std::string line;
 	eAction action = EMPTY;
 	static int count = 0;
-
-	std::ifstream input;
 	bool stdinput = false;
 
-	if (argc == 2) {
-		input.open(argv[1]);
-	}
+	std::ifstream filestream;
+	std::ostringstream input;
 
 	Factory fact = Factory();
 	Parser parser = Parser();
+	Lexer lexer = Lexer();
 
-	while (!(input.eof()) && action != EXIT) {
+	if (argc == 2) {
+		filestream.open(argv[1]);
+		input << filestream.rdbuf();
+		filestream.close();
+
+		std::string check = input.str();
+		try {
+			lexer.analyze(check, argv[1]);
+		}
+		catch (Lexer::LexicalException &e) {
+			std::cout << "Terminating the program due to lexical errors..." << std::endl;
+			filestream.close();
+			return -1;
+		}
+
+		filestream.open(argv[1]);
+	}
+
+/*
+	if (std::regex_search((input.rdbuf()), std::regex("exit(( )?(;)+(.)*)?"))) {
+		std::cout << "SUCCESS" << '\n';
+	} else {
+		std::cout << "FAIL!" << '\n';
+	}
+*/
+	while (!(filestream.eof()) && action != EXIT) {
 		++count;
-		std::getline (input, line);
+		std::getline (filestream, line);
 		if (line.empty() || line[0] == ';') {
 			continue;
 		}
@@ -61,8 +85,9 @@ int main(int argc, char **argv) {
 			case EXIT:
 				break;
 			case ERROR:
-				std::cout << "Terminating the program due to error..." << std::endl;
-				return(-1);
+				std::cout << "Terminating the program due to error..."
+				<< std::endl;
+				return -1;
 			case EMPTY:;
 		}
 	}

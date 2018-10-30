@@ -36,19 +36,51 @@ Lexer::~Lexer(void) {
 	return;
 }
 
-void Lexer::analyze(std::string line) const {
+void Lexer::analyze(std::string check, char *path) const {
 
-	bool error = true;
+	std::string line;
+	std::stringstream _error;
 
-	for (std::size_t i = 0; i < (sizeof(rules) / sizeof(rules)[0]); i++) {
-		if (std::regex_match(line, rules[i])) {
-			error = false;
+	std::ifstream filestream(path);
+
+	// Line-by-line check for error messages collection
+
+	while (!(filestream.eof())) {
+		bool error = true;
+
+		static int count = 0;
+		++count;
+
+		// Skipping empty lines and comments
+		std::getline (filestream, line);
+		if (line.empty() || line[0] == ';') {
+			continue;
+		}
+
+		for (std::size_t i = 0; i < (sizeof(rules) / sizeof(rules)[0]); i++) {
+
+			if (std::regex_match(line, rules[i])) {
+				error = false;
+			}
+		}
+		if (error) {
+			_error << "\tLine " << "\033[1;33m" << count << "\033[0m" << ": "
+			<< "\033[1;31m" << line << "\033[0m" << std::endl;
 		}
 	}
 
-	if (!error) {
-		std::cout << line << std::endl;
-	} else {
+	// Checking for 'exit' command
+
+	if (!std::regex_search(check, std::regex("^exit(( )?(;)+(.)*)?"))) {
+		_error << "\033[1;33m" << "\tThere is no 'exit' command" << "\033[0m"
+		<< std::endl;
+	}
+
+	// Checking for errors presense and raising an exception
+
+	if (_error.good()) {
+		std::cout << "The following lexical errors were found: " << std::endl;
+		std::cout << _error.rdbuf();
 		throw LexicalException();
 	}
 }
@@ -79,5 +111,5 @@ Lexer::LexicalException &Lexer::LexicalException::operator=(const LexicalExcepti
 
 const char    *Lexer::LexicalException::what() const throw() {
 
-	return "Lexical error in the line ";
+	return "";
 }

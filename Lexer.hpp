@@ -16,14 +16,16 @@
 # include <iostream>
 # include "IOperand.hpp"
 # include <regex>
+# include <fstream>
+# include <sstream>
 
 static std::regex rules[] = {
 	std::regex("(push|assert) (int8\\()(\\-)?[0-9]+(\\))(( )?(;)+(.)*)?"),
 	std::regex("(push|assert) (int16\\()(\\-)?[0-9]+(\\))(( )?(;)+(.)*)?"),
 	std::regex("(push|assert) (int32\\()(\\-)?[0-9]+(\\))(( )?(;)+(.)*)?"),
 	std::regex("(push|assert) (float\\()(\\-)?[0-9]+.[0-9]+(\\))(( )?(;)+(.)*)?"),
-	std::regex("(push|assert) (double\\()(\\-)?[0-9]+.[0-9]+(\\))(( )?(;)+(.)*)?"),
-	std::regex("(pop|dump|add|sub|mul|div|mod|print|exit)"),
+	std::regex("(push|assert) (double\\()(\\-)?([0-9])+.([0-9])+(\\))(( )?(;)+(.)*)?"),
+	std::regex("(pop|dump|add|sub|mul|div|mod|print|exit)(( )?(;)+(.)*)?"),
 
 };
 
@@ -36,16 +38,16 @@ public:
 	Lexer& operator=(const Lexer&);
 	~Lexer(void);
 
-	void analyze(std::string) const;
+	void analyze(std::string check, char *path) const;
 
 	class LexicalException : public std::exception {
 
-	public:
-		LexicalException(void);
-		LexicalException(const LexicalException &src);
-		virtual ~LexicalException(void) throw();
-		LexicalException &operator=(const LexicalException &src);
-		virtual const char *what() const throw();
+		public:
+			LexicalException(void);
+			LexicalException(const LexicalException &src);
+			virtual ~LexicalException(void) throw();
+			LexicalException &operator=(const LexicalException &src);
+			virtual const char *what() const throw();
 	};
 
 private:
