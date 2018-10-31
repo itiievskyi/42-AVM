@@ -38,7 +38,8 @@ public:
 	Lexer& operator=(const Lexer&);
 	~Lexer(void);
 
-	void analyze(std::string check, std::stringstream &input) const;
+	void analyze(std::string check, std::stringstream &input);
+	int getLen(void) const;
 
 	class LexicalException : public std::exception {
 
@@ -51,6 +52,8 @@ public:
 	};
 
 private:
+
+	int _len;
 
 };
 

@@ -12,7 +12,7 @@
 
 #include "Lexer.hpp"
 
-Lexer::Lexer(void) {
+Lexer::Lexer(void) :_len(48) {
 
 	return;
 }
@@ -36,7 +36,7 @@ Lexer::~Lexer(void) {
 	return;
 }
 
-void Lexer::analyze(std::string check, std::stringstream &input) const {
+void Lexer::analyze(std::string check, std::stringstream &input) {
 
 	std::string line;
 	std::stringstream _error;
@@ -64,6 +64,10 @@ void Lexer::analyze(std::string check, std::stringstream &input) const {
 		if (error) {
 			_error << "\tLine " << "\033[1;33m" << count << "\033[0m" << ": "
 			<< "\033[1;31m" << line << "\033[0m" << std::endl;
+			int newLen = line.length() + 15 + std::to_string(count).length();
+			if (newLen > this->_len && newLen <= 80) {
+				this->_len = newLen;
+			}
 		}
 	}
 
@@ -77,10 +81,19 @@ void Lexer::analyze(std::string check, std::stringstream &input) const {
 	// Checking for errors presense and raising an exception
 
 	if (_error.good() && _error.str().size() > 0) {
-		std::cout << "The following lexical errors were found: " << std::endl;
+		for (int i = 0; i < _len; i++) {
+			std::cout << "\xe2\x95\x90";
+		}
+		std::cout << std::endl << "\033[1;32m" <<
+		"The following lexical errors were found: " << "\033[0m" << std::endl;
 		std::cout << _error.rdbuf();
 		throw LexicalException();
 	}
+}
+
+int Lexer::getLen(void) const {
+
+	return this->_len;
 }
 
 Lexer::LexicalException::LexicalException(void) {

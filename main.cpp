@@ -12,6 +12,21 @@
 
 #include "AbstractVM.hpp"
 
+void placeFileErrorMsg(std::string msg, std::string path) {
+	int len = 9 + path.length() + msg.length();
+	for (int i = 0; (i < len && i < 80); i++) {
+		std::cout << "\xe2\x95\x90";
+	}
+	std::cout << std::endl;
+	std::cout << "\033[1;31m" << "ERROR: " << "\033[0m"
+	<< path << ": " << "\033[1;33m"
+	<< msg << "\033[0m" << std::endl;
+	for (int i = 0; (i < len && i < 80); i++) {
+		std::cout << "\xe2\x95\x90";
+	}
+	std::cout << std::endl;
+}
+
 int main(int argc, char **argv) {
 
 	std::stack<IOperand *> avmStack;
@@ -36,7 +51,8 @@ int main(int argc, char **argv) {
 			lexerInput << line << std::endl;
 			parserInput << line << std::endl;
 		}
-		if (line != ";;") { // Checking for ctrl+D input interruption
+		// Checking for ctrl+D input interruption
+		if (line != ";;") {
 			std::cout << "═══════════════════════════════════════════════════"
 			<< std::endl << "\033[1;31m" <<
 			"ERROR: The input was interrupted by pressing Ctrl+D" << std::endl
@@ -47,6 +63,34 @@ int main(int argc, char **argv) {
 		}
 		check = lexerInput.str();
 	} else if (argc == 2) {
+		// Checking for ctrl+D uncatchable errors with /dev/ paths
+		if (std::string(argv[1]) == "/dev/null" ||
+		std::string(argv[1]) == "/dev/random") {
+			placeFileErrorMsg("bad path specified", std::string(argv[1]));
+			return -1;
+		}
+		filestream.open(argv[1]);
+		// Checking for errors while opening
+		try {
+			filestream.exceptions(std::ios::failbit | std::ios::badbit);
+			filestream.seekg(0, std::ios::end);
+		} catch (std::ios_base::failure &err) {
+			placeFileErrorMsg(
+				std::string(std::strerror(errno)), std::string(argv[1]));
+			return -1;
+		}
+		// Checking for directory or other errors while reading
+		try {
+			errno = 0;
+			std::string temp;
+			while (std::getline(filestream, temp)) {}
+		} catch (std::ios_base::failure &err) {
+			if (errno != 0) {
+				placeFileErrorMsg(
+					std::string(std::strerror(errno)), std::string(argv[1]));
+				return -1;
+			}
+		}
 		filestream.open(argv[1]);
 		lexerInput << filestream.rdbuf();
 		filestream.close();
@@ -56,8 +100,8 @@ int main(int argc, char **argv) {
 		check = lexerInput.str();
 	} else {
 		std::cout << "═════════════════════════" << std::endl;
-		std::cout << "\033[1;31m" << "ERROR: Too many arguments" << "\033[0m"
-		<< std::endl;
+		std::cout << "\033[1;31m" << "ERROR: " << "\033[1;33m" <<
+		"Too many arguments" << "\033[0m" << std::endl;
 		std::cout << "═════════════════════════" << std::endl;
 		return -1;
 	}
@@ -68,8 +112,13 @@ int main(int argc, char **argv) {
 		lexer.analyze(check, lexerInput);
 	}
 	catch (Lexer::LexicalException &e) {
-		std::cout << "Terminating the program due to lexical errors..." << std::endl;
-		filestream.close();
+		std::cout << "\033[1;32m" <<
+		"Terminating the program due to lexical errors..." << "\033[0m"
+		<< std::endl;
+		for (int i = 0; i < lexer.getLen(); i++) {
+			std::cout << "\xe2\x95\x90";
+		}
+		std::cout << std::endl;
 		return -1;
 	}
 
