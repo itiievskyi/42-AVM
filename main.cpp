@@ -22,7 +22,9 @@ int main(int argc, char **argv) {
 	bool stdinput = false;
 
 	std::ifstream filestream;
-	std::stringstream input;
+	std::stringstream lexerInput;
+	std::stringstream parserInput;
+	std::string check;
 
 	Factory fact = Factory();
 	Parser parser = Parser();
@@ -31,39 +33,52 @@ int main(int argc, char **argv) {
 	if (argc == 1) {
 		while (!(std::cin.eof()) && line != ";;") {
 			std::getline(std::cin, line);
-			input << line << std::endl;
+			lexerInput << line << std::endl;
+			parserInput << line << std::endl;
 		}
-	} else if (argc == 2) {
-		filestream.open(argv[1]);
-		input << filestream.rdbuf();
-		filestream.close();
-
-		std::string check = input.str();
-		try {
-			lexer.analyze(check, argv[1]);
-		}
-		catch (Lexer::LexicalException &e) {
-			std::cout << "Terminating the program due to lexical errors..." << std::endl;
-			filestream.close();
+		if (line != ";;") { // Checking for ctrl+D input interruption
+			std::cout << "═══════════════════════════════════════════════════"
+			<< std::endl << "\033[1;31m" <<
+			"ERROR: The input was interrupted by pressing Ctrl+D" << std::endl
+			<< "\033[1;33m" << "Use ';;' command at the start of a line instead"
+			<< "\033[0m" << std::endl <<
+			"═══════════════════════════════════════════════════" << std::endl;
 			return -1;
 		}
+		check = lexerInput.str();
+	} else if (argc == 2) {
 		filestream.open(argv[1]);
+		lexerInput << filestream.rdbuf();
+		filestream.close();
+		filestream.open(argv[1]);
+		parserInput << filestream.rdbuf();
+		filestream.close();
+		check = lexerInput.str();
 	} else {
+		std::cout << "═════════════════════════" << std::endl;
 		std::cout << "\033[1;31m" << "ERROR: Too many arguments" << "\033[0m"
 		<< std::endl;
+		std::cout << "═════════════════════════" << std::endl;
 		return -1;
 	}
 
-/*
-	if (std::regex_search((input.rdbuf()), std::regex("exit(( )?(;)+(.)*)?"))) {
-		std::cout << "SUCCESS" << '\n';
-	} else {
-		std::cout << "FAIL!" << '\n';
+	// Checking for lexical errors
+
+	try {
+		lexer.analyze(check, lexerInput);
 	}
-*/
-	while (!(input.eof()) && action != EXIT) {
+	catch (Lexer::LexicalException &e) {
+		std::cout << "Terminating the program due to lexical errors..." << std::endl;
+		filestream.close();
+		return -1;
+	}
+
+	// Parsing the commands
+
+	while (!(parserInput.eof()) && action != EXIT) {
 		++count;
-		std::getline(input, line);
+		std::cout << count << '\n';
+		std::getline(parserInput, line);
 		if (line.empty() || line[0] == ';') {
 			continue;
 		}

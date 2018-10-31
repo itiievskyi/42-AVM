@@ -36,23 +36,21 @@ Lexer::~Lexer(void) {
 	return;
 }
 
-void Lexer::analyze(std::string check, char *path) const {
+void Lexer::analyze(std::string check, std::stringstream &input) const {
 
 	std::string line;
 	std::stringstream _error;
 
-	std::ifstream filestream(path);
-
 	// Line-by-line check for error messages collection
 
-	while (!(filestream.eof())) {
+	while (!(input.eof())) {
 		bool error = true;
 
 		static int count = 0;
 		++count;
 
 		// Skipping empty lines and comments
-		std::getline (filestream, line);
+		std::getline (input, line);
 		if (line.empty() || line[0] == ';') {
 			continue;
 		}

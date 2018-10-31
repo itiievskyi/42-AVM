@@ -38,7 +38,7 @@ public:
 	Lexer& operator=(const Lexer&);
 	~Lexer(void);
 
-	void analyze(std::string check, char *path) const;
+	void analyze(std::string check, std::stringstream &input) const;
 
 	class LexicalException : public std::exception {
 
