@@ -13,6 +13,7 @@
 #ifndef ABSTRACTVM_H
 # define ABSTRACTVM_H
 
+# include "OperationExceptions.hpp"
 # include "Operand.tpp"
 # include "Factory.hpp"
 # include "Parser.hpp"

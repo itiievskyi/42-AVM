@@ -37,20 +37,72 @@ Parser::~Parser(void) {
 }
 
 void Parser::parse(std::string line, bool stdinput, int count) {
-/*
+
+	std::smatch sm;
+
 	_line = line;
 
-	static Lexer lexer = Lexer();
-	try {
-		lexer.analyze(line);
+	// Parsing the operation type
+
+	std::regex_match(line, sm, std::regex(
+		"^(pop|dump|add|sub|mul|div|mod|print|exit|push|assert)(.)*"));
+	if (sm[1] == "pop") {
+		_act = POP;
+	} else if (sm[1] == "dump") {
+		_act = DUMP;
+	} else if (sm[1] == "add") {
+		_act = ADD;
+	} else if (sm[1] == "sub") {
+		_act = SUB;
+	} else if (sm[1] == "mul") {
+		_act = MUL;
+	} else if (sm[1] == "div") {
+		_act = DIV;
+	} else if (sm[1] == "mod") {
+		_act = MOD;
+	} else if (sm[1] == "print") {
+		_act = PRINT;
+	} else if (sm[1] == "exit") {
+		_act = EXIT;
+	} else if (sm[1] == "push") {
+		_act = PUSH;
+	} else if (sm[1] == "assert") {
+		_act = ASSERT;
 	}
-	catch (Lexer::LexicalException &e) {
-		std::cout << e.what() << "\033[1;33m" << count << "\033[0m"
-		<< ": \033[1;31m" << _line << "\033[0m" << std::endl;
-		_act = ERROR;
+
+	// Parsing the number type & the number itself
+
+	std::regex_match(line, sm, std::regex(
+		"^(push|assert) (int8|int16|int32|float|double)(.)*"));
+	if (sm[2] == "int8") {
+		_type = Int8;
+		std::regex_match(line, sm, std::regex(
+			"^(push|assert) (int8\\()(\\-?[0-9]+)(\\))(( )?(;)+(.)*)?"));
+		_num = sm[3];
+	} else if (sm[2] == "int16") {
+		_type = Int16;
+		std::regex_match(line, sm, std::regex(
+			"^(push|assert) (int16\\()(\\-?[0-9]+)(\\))(( )?(;)+(.)*)?"));
+		_num = sm[3];
+	} else if (sm[2] == "int32") {
+		_type = Int32;
+		std::regex_match(line, sm, std::regex(
+			"^(push|assert) (int32\\()(\\-?[0-9]+)(\\))(( )?(;)+(.)*)?"));
+		_num = sm[3];
+	} else if (sm[2] == "float") {
+		_type = Float;
+		std::regex_match(line, sm, std::regex(
+			"^(push|assert) (float\\()(\\-?[0-9]+.[0-9]+)(\\))(( )?(;)+(.)*)?"));
+		_num = sm[3];
+	} else if (sm[2] == "double") {
+		_type = Double;
+		std::regex_match(line, sm, std::regex(
+			"^(push|assert) (double\\()(\\-?[0-9]+.[0-9]+)(\\))(( )?(;)+(.)*)?"));
+		_num = sm[3];
 	}
-*/
-//	std::cout << "/* message */" << '\n';
+
+//	std::cout << "operation = '" << _act << "', type = '" << _type << "', num = '" << _num << "'"<< std::endl;
+
 	if (stdinput && line != "" && count) {}
 
 }

@@ -1,13 +1,16 @@
-push int32(42)
+push int8(99)
+dump
+print
+div
 push int32(33)
 add
 push float(44.55)
 mul
 push double(42.42)
 push int32(42)
-dump
 pop
-assert double(42.42)
+dump
+assert double(42.420)
 
 ;;;;;
 ; asdfaf
@@ -16,15 +19,9 @@ assert double(42.42)
 push int8(33) ;!
 push double(112) ;p
 push int8(111)
-push int8(108) ;l
+push int8(-108) ;l
 push int8(112) ;p
 
 push int8(112) ; exit
 
 exit;fsad
-
-fdgh
-
-asffadfadfasdfasfsaafs
-
-push int8(108) fffdsfl

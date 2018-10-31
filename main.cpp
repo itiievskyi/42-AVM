@@ -12,6 +12,7 @@
 
 #include "AbstractVM.hpp"
 
+
 void placeFileErrorMsg(std::string msg, std::string path) {
 	int len = 9 + path.length() + msg.length();
 	for (int i = 0; (i < len && i < 80); i++) {
@@ -29,7 +30,7 @@ void placeFileErrorMsg(std::string msg, std::string path) {
 
 int main(int argc, char **argv) {
 
-	std::stack<IOperand *> avmStack;
+	std::stack<const IOperand *> avmStack;
 
 	std::string line;
 	eAction action = EMPTY;
@@ -91,6 +92,7 @@ int main(int argc, char **argv) {
 				return -1;
 			}
 		}
+		filestream.close();
 		filestream.open(argv[1]);
 		lexerInput << filestream.rdbuf();
 		filestream.close();
@@ -124,45 +126,92 @@ int main(int argc, char **argv) {
 
 	// Parsing the commands
 
-	while (!(parserInput.eof()) && action != EXIT) {
-		++count;
-		std::cout << count << '\n';
-		std::getline(parserInput, line);
-		if (line.empty() || line[0] == ';') {
-			continue;
+	try {
+		while (!(parserInput.eof()) && action != EXIT && action != ERROR) {
+			++count;
+			std::getline(parserInput, line);
+			if (line.empty() || line[0] == ';') {
+				continue;
+			}
+			parser.parse(line, stdinput, count);
+			action = parser.getAct();
+			if ((action == POP || action == DUMP || action == ASSERT ||
+				action == PRINT) && !avmStack.size()) {
+				throw EmptyStackException();
+			}
+			if ((action == ADD || action == DIV || action == SUB ||
+				action == MUL || action == MOD) && avmStack.size() < 2) {
+				throw EmptyStackException();
+			}
+			switch (action) {
+				case PUSH: {
+					IOperand const *num = fact.createOperand(
+						parser.getType(), parser.getNum());
+					avmStack.push(num);
+					break;
+				}
+				case POP: {
+					delete avmStack.top();
+					avmStack.pop();
+					break;
+				}
+				case DUMP: {
+					std::cout << avmStack.top()->toString() << std::endl;
+					break;
+				}
+				case ASSERT: {
+					if (!(avmStack.top()->getType() == parser.getType() &&
+					std::stold(parser.getNum()) == std::stold(avmStack.top()->toString()))) {
+						throw AssertionException();
+					}
+					break;
+				}
+				case ADD: {
+
+					break;
+				}
+				case SUB: {
+
+					break;
+				}
+				case MUL: {
+
+					break;
+				}
+				case DIV: {
+
+					break;
+				}
+				case MOD: {
+
+					break;
+				}
+				case PRINT: {
+					if (avmStack.top()->getType() == 0) {
+						int ch = std::stoi(avmStack.top()->toString());
+						if (std::isprint(ch)) {
+							std::cout << static_cast<char>(ch) << std::endl;
+						} else {
+							throw NonInt8Exception(ch);
+						}
+					} else {
+						throw NonPrintableException();
+					}
+					break;
+				}
+				case EXIT:
+					break;
+				case ERROR:
+					std::cout << "Terminating the program due to error..."
+					<< std::endl;
+					std::system("leaks -q avm");
+					return -1;
+				case EMPTY:;
+			}
 		}
-		parser.parse(line, stdinput, count);
-		action = parser.getAct();
-		switch (action) {
-			case PUSH:
-
-			case POP:
-
-			case DUMP:
-
-			case ASSERT:
-
-			case ADD:
-
-			case SUB:
-
-			case MUL:
-
-			case DIV:
-
-			case MOD:
-
-			case PRINT:
-
-			case EXIT:
-				break;
-			case ERROR:
-				std::cout << "Terminating the program due to error..."
-				<< std::endl;
-				std::system("leaks -q avm");
-				return -1;
-			case EMPTY:;
-		}
+	}
+	catch (std::exception &e) {
+		placeFileErrorMsg(e.what(), ("Line " + std::to_string(count) + ": " + line));
 	}
 
 /*

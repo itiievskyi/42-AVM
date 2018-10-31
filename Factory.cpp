@@ -47,7 +47,7 @@ Factory::~Factory(void) {
 }
 
 IOperand const *Factory::createOperand(eOperandType type, std::string const &value) const {
-	try {
+
 		long long test = std::stod(value);
 		if (type == Int8 && (test > INT8_MAX || test < INT8_MIN)) {
 			throw Factory::CreationOutOfRangeExceprion("Int8", value);
@@ -60,15 +60,7 @@ IOperand const *Factory::createOperand(eOperandType type, std::string const &val
 		} else if (type == Double && (test > DBL_MAX || test < -DBL_MAX)) {
 			throw Factory::CreationOutOfRangeExceprion("Double", value);
 		}
-	}
-	catch (std::out_of_range &e) {
-		std::cout << e.what() << std::endl;
-		exit (-1);
-	}
-	catch (Factory::CreationOutOfRangeExceprion &e) {
-		std::cout << e.what() << std::endl;
-		exit (-1);
-	}
+
 	return (this->*_funcs[type])(value);
 }
 
@@ -126,7 +118,7 @@ Factory::CreationOutOfRangeExceprion &Factory::CreationOutOfRangeExceprion::oper
 
 const char    *Factory::CreationOutOfRangeExceprion::what() const throw() {
 
-	std::string error = "ERROR! Object of type " + _type +
+	std::string error = "Object of type " + _type +
 	" can't be created with the value " + _value + " due to overflow or underflow";
 
 	return error.c_str();

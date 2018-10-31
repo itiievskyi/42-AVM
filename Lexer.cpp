@@ -43,7 +43,12 @@ void Lexer::analyze(std::string check, std::stringstream &input) {
 
 	// Line-by-line check for error messages collection
 
-	while (!(input.eof())) {
+	if (check == "") {
+		_error << "\033[1;33m" << "\tThe file you try to proceed is empty"
+		<< "\033[0m" << std::endl;
+	}
+
+	while (!(input.eof()) && check != "") {
 		bool error = true;
 
 		static int count = 0;
@@ -73,7 +78,8 @@ void Lexer::analyze(std::string check, std::stringstream &input) {
 
 	// Checking for 'exit' command
 
-	if (!std::regex_search(check, std::regex("(^|\\n)+exit(( )?(;)+(.)*)?"))) {
+	if (check != "" &&
+	!std::regex_search(check, std::regex("(^|\\n)+exit(( )?(;)+(.)*)?"))) {
 		_error << "\033[1;33m" << "\tThere is no 'exit' command" << "\033[0m"
 		<< std::endl;
 	}

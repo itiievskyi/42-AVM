@@ -24,6 +24,7 @@ SOURCES =	main.cpp \
 			Factory.cpp \
 			Parser.cpp \
 			Lexer.cpp \
+			OperationExceptions.cpp \
 
 SRCS = $(addprefix $(DIR_S)/,$(SOURCES))
 
