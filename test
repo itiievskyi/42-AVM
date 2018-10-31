@@ -1,27 +1,15 @@
-push int8(99)
-dump
-print
-div
+; -------------
+; sample.avm -
+; -------------
+
+push int32(42)
 push int32(33)
 add
 push float(44.55)
 mul
 push double(42.42)
-push int32(42)
-pop
+push int32(420)
 dump
-assert double(42.420)
-
-;;;;;
-; asdfaf
-;
-
-push int8(33) ;!
-push double(112) ;p
-push int8(111)
-push int8(-108) ;l
-push int8(112) ;p
-
-push int8(112) ; exit
-
-exit;fsad
+pop
+assert double(42.42)
+exit

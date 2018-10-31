@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "AbstractVM.hpp"
-
+#include "mutantstack.hpp"
 
 void placeFileErrorMsg(std::string msg, std::string path) {
 	int len = 9 + path.length() + msg.length();
@@ -30,7 +29,7 @@ void placeFileErrorMsg(std::string msg, std::string path) {
 
 int main(int argc, char **argv) {
 
-	std::stack<const IOperand *> avmStack;
+	MutantStack<const IOperand *> avmStack;
 
 	std::string line;
 	eAction action = EMPTY;
@@ -156,7 +155,14 @@ int main(int argc, char **argv) {
 					break;
 				}
 				case DUMP: {
-					std::cout << avmStack.top()->toString() << std::endl;
+					MutantStack<const IOperand *>::iterator it = avmStack.begin();
+					MutantStack<const IOperand *>::iterator ite = avmStack.end();
+
+					--ite;
+					while (it <= ite) {
+						std::cout << (*ite)->toString() << std::endl;
+						--ite;
+					}
 					break;
 				}
 				case ASSERT: {
