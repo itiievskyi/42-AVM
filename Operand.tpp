@@ -42,11 +42,11 @@ public:
 	Operand(T value) {
 		if (this->getType() == Float) {
 			std::ostringstream temp;
-			temp << std::fixed << std::setprecision(2) << value << "f";
+			temp << value;
 			this->_value = temp.str();
 		} else if (this->getType() == Double) {
 			std::ostringstream temp;
-			temp << std::fixed << std::setprecision(2) << value;
+			temp << value;
 			this->_value = temp.str();
 		} else {
 			this->_value = std::to_string(value);
@@ -79,10 +79,11 @@ public:
 				return *this;
 			}
 			virtual const char *what() const throw() {
-				std::string error = "ERROR! Object of type " + _type +
-				" can't be created with the resulting value of expression '("
-				+ std::to_string(_v2) + ") " + _op + " ("
-				+ std::to_string(_v1) + ")' due to breaking type limits";
+				std::stringstream ss;
+				ss << "Breaking the limits of type " << _type <<
+				": '(" << _v1 << ") " << _op << " (" << _v2 << ")'";
+
+				std::string error = "" + ss.str() + "";
 				return error.c_str();
 			}
 
@@ -106,10 +107,11 @@ public:
 				return *this;
 			}
 			virtual const char *what() const throw() {
-				std::string error =
-				"ERROR! Division by 0 was detected while calculating an expression: '("
-				+ std::to_string(_v2) + ") " + _op + " ("
-				+ std::to_string(_v1) + ")'";
+				std::stringstream ss;
+				ss << "Division or modulo by 0: '(" << _v1 << ") " << _op << " ("
+				<< _v2 << ")'";
+
+				std::string error = "" + ss.str() + "";
 				return error.c_str();
 			}
 
@@ -127,7 +129,7 @@ public:
 
 		switch (op) {
 			case '+':
-				result = v2 + v1;
+				result = v1 + v2;
 				if (type == Int8 && (result > INT8_MAX || result < INT8_MIN)) {
 					throw OperationOverflowException("+", v1, v2, "Int8");
 				} else if (type == Int16 && (result > INT16_MAX || result < INT16_MIN)) {
@@ -141,7 +143,7 @@ public:
 				}
 				break;
 			case '-':
-				result = v2 - v1;
+				result = v1 - v2;
 				if (type == Int8 && (result > INT8_MAX || result < INT8_MIN)) {
 					throw OperationOverflowException("-", v1, v2, "Int8");
 				} else if (type == Int16 && (result > INT16_MAX || result < INT16_MIN)) {
@@ -155,7 +157,7 @@ public:
 				}
 				break;
 			case '*':
-				result = v2 * v1;
+				result = v1 * v2;
 				if (type == Int8 && (result > INT8_MAX || result < INT8_MIN)) {
 					throw OperationOverflowException("*", v1, v2, "Int8");
 				} else if (type == Int16 && (result > INT16_MAX || result < INT16_MIN)) {
@@ -169,11 +171,11 @@ public:
 				}
 				break;
 			case '/':
-				if (v1 == 0) {
+				if (v2 == 0) {
 					throw ZeroDivisionException("/", v1, v2);
 					return;
 				}
-				result = v2 / v1;
+				result = v1 / v2;
 				if (type == Int8 && (result > INT8_MAX || result < INT8_MIN)) {
 					throw OperationOverflowException("/", v1, v2, "Int8");
 				} else if (type == Int16 && (result > INT16_MAX || result < INT16_MIN)) {
@@ -187,11 +189,11 @@ public:
 				}
 				break;
 			case '%':
-				if (v1 == 0) {
+				if (v2 == 0) {
 					throw ZeroDivisionException("%", v1, v2);
 					return;
 				}
-				result = std::fmod(v2, v1);
+				result = std::fmod(v1, v2);
 				if (type == Int8 && (result > INT8_MAX || result < INT8_MIN)) {
 					throw OperationOverflowException("%", v1, v2, "Int8");
 				} else if (type == Int16 && (result > INT16_MAX || result < INT16_MIN)) {
@@ -213,18 +215,11 @@ public:
 
 		eOperandType newType =
 		(this->getType() < rhs.getType() ? rhs.getType() : this->getType());
-
-		try {
-			this->checkOperationOverflow('+', v1, v2, newType);
-		}
-		catch(Operand::OperationOverflowException &e) {
-			std::cout << e.what() << std::endl;
-			exit(-1);
-		}
+		this->checkOperationOverflow('+', v1, v2, newType);
 		IOperand const *ret;
 
 		Factory *factory = new Factory();
-		ret = factory->createOperand(newType, std::to_string(v2 + v1));
+		ret = factory->createOperand(newType, std::to_string(v1 + v2));
 		delete factory;
 
 		return ret;
@@ -236,18 +231,11 @@ public:
 
 		eOperandType newType =
 		(this->getType() < rhs.getType() ? rhs.getType() : this->getType());
-
-		try {
-			this->checkOperationOverflow('-', v1, v2, newType);
-		}
-		catch(Operand::OperationOverflowException &e) {
-			std::cout << e.what() << std::endl;
-			exit(-1);
-		}
+		this->checkOperationOverflow('-', v1, v2, newType);
 		IOperand const *ret;
 
 		Factory *factory = new Factory();
-		ret = factory->createOperand(newType, std::to_string(v2 - v1));
+		ret = factory->createOperand(newType, std::to_string(v1 - v2));
 		delete factory;
 
 		return ret;
@@ -259,14 +247,7 @@ public:
 
 		eOperandType newType =
 		(this->getType() < rhs.getType() ? rhs.getType() : this->getType());
-
-		try {
-			this->checkOperationOverflow('*', v1, v2, newType);
-		}
-		catch(Operand::OperationOverflowException &e) {
-			std::cout << e.what() << std::endl;
-			exit(-1);
-		}
+		this->checkOperationOverflow('*', v1, v2, newType);
 		IOperand const *ret;
 
 		Factory *factory = new Factory();
@@ -282,22 +263,11 @@ public:
 
 		eOperandType newType =
 		(this->getType() < rhs.getType() ? rhs.getType() : this->getType());
-
-		try {
-			this->checkOperationOverflow('/', v1, v2, newType);
-		}
-		catch(Operand::OperationOverflowException &e) {
-			std::cout << e.what() << std::endl;
-			exit(-1);
-		}
-		catch(Operand::ZeroDivisionException &e) {
-			std::cout << e.what() << std::endl;
-			exit(-1);
-		}
+		this->checkOperationOverflow('/', v1, v2, newType);
 		IOperand const *ret;
 
 		Factory *factory = new Factory();
-		ret = factory->createOperand(newType, std::to_string(v2 / v1));
+		ret = factory->createOperand(newType, std::to_string(v1 / v2));
 		delete factory;
 
 		return ret;
@@ -309,22 +279,11 @@ public:
 
 		eOperandType newType =
 		(this->getType() < rhs.getType() ? rhs.getType() : this->getType());
-
-		try {
-			this->checkOperationOverflow('%', v1, v2, newType);
-		}
-		catch(Operand::OperationOverflowException &e) {
-			std::cout << e.what() << std::endl;
-			exit(-1);
-		}
-		catch(Operand::ZeroDivisionException &e) {
-			std::cout << e.what() << std::endl;
-			exit(-1);
-		}
+		this->checkOperationOverflow('%', v1, v2, newType);
 		IOperand const *ret;
 
 		Factory *factory = new Factory();
-		ret = factory->createOperand(newType, std::to_string(std::fmod(v2, v1)));
+		ret = factory->createOperand(newType, std::to_string(std::fmod(v1, v2)));
 		delete factory;
 
 		return ret;

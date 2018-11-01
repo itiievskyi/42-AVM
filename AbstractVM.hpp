@@ -21,8 +21,9 @@
 # include <sstream>
 # include <fstream>
 # include <iomanip>
+# include <string>
 # include <vector>
-# include <stack>
+# include <list>
 
 template<> int Operand<int8_t>::getPrecision(void) const {
 	return Int8;

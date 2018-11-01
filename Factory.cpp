@@ -118,8 +118,7 @@ Factory::CreationOutOfRangeExceprion &Factory::CreationOutOfRangeExceprion::oper
 
 const char    *Factory::CreationOutOfRangeExceprion::what() const throw() {
 
-	std::string error = "Object of type " + _type +
-	" can't be created with the value " + _value + " due to overflow or underflow";
+	std::string error = "Over- or underflow for type " + _type;
 
 	return error.c_str();
 }

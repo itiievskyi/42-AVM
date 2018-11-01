@@ -29,7 +29,6 @@ enum eAction {
 	MOD,
 	PRINT,
 	EXIT,
-	ERROR,
 	EMPTY
 };
 
