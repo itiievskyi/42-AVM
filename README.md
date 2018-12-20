@@ -6,7 +6,7 @@ These arithmetic expressions are provided to the machine as basic assembly progr
 The language of AbstractVM is composed of a series of instructions, with one instruction per line.
 
 * **Comments**: Comments start with a ’;’ and finish with a newline. A comment can be either at the start of a line, or after an instruction.
-* **push *v**: Pushes the value *v* at the top of the stack. The value *v* must have one of the following form:
+* **push *v***: Pushes the value *v* at the top of the stack. The value *v* must have one of the following form:
   * int8(n) : Creates an 8-bit integer with value n.
   * int16(n) : Creates a 16-bit integer with value n.
   * int32(n) : Creates a 32-bit integer with value n.
